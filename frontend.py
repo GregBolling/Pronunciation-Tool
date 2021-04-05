@@ -10,7 +10,7 @@ app.config.from_mapping(
         SECRET_KEY='dev'
     )
 sent = ""
-mic = speech_recog.Microphone()
+mic = speech_recog.Microphone(device_index=0)
 recog = speech_recog.Recognizer()
 evaluation_sents = ['time', 'bad', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
 
@@ -26,9 +26,9 @@ def homepage():
     session['index'] = 0
     return '''
         <h3 align="center">Welcome! Would you like to get started?</h3>
-        <p align="center">
+        <p align="center" >
             <a href=input >
-                <button class=grey style="height:75px;width:150px">
+                <button class=grey>
                     Yes
                 </button>
             </a>
@@ -43,7 +43,7 @@ def input():
             <h3 align="center">Please read the following sentence: {}</h3>
             <p align="center">
                 <a href=recognizer >
-                    <button class=grey style="height:75px;width:150px">
+                    <button class=grey>
                         Press to record
                     </button>
                 </a>
@@ -60,25 +60,25 @@ def recognizer():
         print("Converting Speech to Text...")
 
         result = backend.phoneme_recognizer(audio_data)
+        session['index'] += 1
         if session['index'] < len(evaluation_sents):
-            session['index'] += 1
             return '''
                 <h3 align="center">You said the following: {}</h3>
                     <p align="center">
                         <a href=input >
-                            <button class=grey style="height:75px;width:150px">
+                            <button class=grey >
                                 Next
                             </button>
                         </a>
                     </p>
                 '''.format(result)
         else:
-            index = 0
+            session['index'] = 0
             return '''
             <h3 align="center">You said the following: {}</h3>
                 <p align="center">
                     <a href=input >
-                        <button class=grey style="height:75px;width:150px">
+                        <button class=grey >
                             Try again?
                         </button>
                     </a>

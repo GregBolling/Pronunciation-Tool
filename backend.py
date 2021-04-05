@@ -1,6 +1,7 @@
 from pocketsphinx import Decoder, get_model_path
 import os
 
+
 def phoneme_recognizer(audio_data):
     model_path = get_model_path()
     raw_data = audio_data.get_raw_data(convert_rate=16000,
@@ -21,3 +22,7 @@ def phoneme_recognizer(audio_data):
     decoder.end_utt()  # stop utterance processing
 
     return [seg.word for seg in decoder.seg()]
+
+
+def classify_correct(audio_data):
+    return 0
