@@ -2,8 +2,10 @@ import speech_recognition as speech_recog
 import pyaudio
 from nltk.corpus import brown
 import random
+import flask
 from flask import Flask, session
 import backend
+from subprocess import run, PIPE
 
 app = Flask(__name__)
 app.config.from_mapping(
@@ -36,8 +38,20 @@ def homepage():
     '''
 
 
-@app.route("/input")
 def input():
+    return flask.render_template('index.html')
+
+
+@app.route("/audio", methods=['POST'])
+def audio():
+    with open('/tmp/audio.wav', 'wb') as f:
+        f.write(flask.request.data)
+    proc = run(['ffprobe', '-of', 'default=noprint_wrappers=1', '/tmp/audio.wav'], text=True, stderr=PIPE)
+    return proc.stderr
+
+
+@app.route("/input")
+def input_old():
     sent = evaluation_sents[session['index']]
     return '''
             <h3 align="center">Please read the following sentence: {}</h3>
@@ -52,7 +66,7 @@ def input():
 
 
 @app.route('/recognizer')
-def recognizer():
+def recognizer_old():
     with mic as audio_file:
         recog.adjust_for_ambient_noise(audio_file)
         audio_data = recog.listen(audio_file)
