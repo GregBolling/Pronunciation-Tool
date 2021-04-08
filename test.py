@@ -1,6 +1,10 @@
 import speech_recognition as speech_recog
 import backend
 import numpy as np
+import sklearn
+import matplotlib.pyplot as plt
+import librosa.display
+import wave
 
 
 mic = speech_recog.Microphone(device_index=0)
@@ -12,18 +16,12 @@ if __name__ == '__main__':
         recog.adjust_for_ambient_noise(audio_file)
         audio_data = recog.listen(audio_file)
 
-        print("Converting Speech to Text...")
-        import wave
         w = wave.open("test.wav", 'wb')
         frame = audio_data.frame_data
         w.setparams((1, audio_data.sample_width))
         w.writeframes(audio_data.get_wav_data())
         w.close()
 
-        result = backend.phoneme_recognizer(audio_data)
-        import sklearn
-        import matplotlib.pyplot as plt
-        import librosa.display
         sr = audio_data.sample_rate
 
         plt.figure(figsize=(20, 5))

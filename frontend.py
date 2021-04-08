@@ -48,9 +48,9 @@ def input_ours():
 
 @app.route("/audio", methods=['POST'])
 def audio():
-    with open('/tmp/audio.wav', 'wb') as f:
+    with open('./test_files/audio.wav', 'wb') as f:
         f.write(flask.request.data)
-    proc = run(['ffprobe', '-of', 'default=noprint_wrappers=1', '/tmp/audio.wav'], text=True, stderr=PIPE)
+    proc = run(['ffprobe', '-of', 'default=noprint_wrappers=1', './test_files/audio.wav'], text=True, stderr=PIPE)
     return proc.stderr
 
 

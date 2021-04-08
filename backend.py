@@ -59,7 +59,7 @@ class Recognizer(object):
             return '''
                                 <h3 align="center">You said the following: {}</h3>
                                     <p align="center">
-                                        <a href=input >
+                                        <a href=input_cmu >
                                             <button class=grey >
                                                 Next
                                             </button>
@@ -71,7 +71,7 @@ class Recognizer(object):
             return '''
                     <h3 align="center">You said the following: {}</h3>
                         <p align="center">
-                            <a href=input >
+                            <a href=input_cmu >
                                 <button class=grey >
                                     Try again?
                                 </button>
