@@ -1,9 +1,7 @@
-import speech_recognition as speech_recog
-import pyaudio
 from nltk.corpus import brown
 import random
 import flask
-from flask import Flask, session
+from flask import Flask
 import backend
 from subprocess import run, PIPE
 
@@ -12,9 +10,8 @@ app.config.from_mapping(
         SECRET_KEY='dev'
     )
 sent = ""
-mic = speech_recog.Microphone(device_index=0)
-recog = speech_recog.Recognizer()
-evaluation_sents = ['time', 'bad', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
+evaluation_sents = ['time', 'dog', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
+recog = backend.Recognizer(evaluation_sents)
 
 
 def generate_random_sent():
@@ -25,20 +22,27 @@ def generate_random_sent():
 
 @app.route("/") # take note of this decorator syntax, it's a common pattern
 def homepage():
-    session['index'] = 0
     return '''
-        <h3 align="center">Welcome! Would you like to get started?</h3>
+        <h3 align="center">Welcome to our Pronunciation Tool! Which evaluation model would you like to use?</h3>
+        <p align="center" >
+            <a href=input_cmu >
+                <button class=grey>
+                    CMU PocketSphinx
+                </button>
+            </a>
+        </p>
         <p align="center" >
             <a href=input >
                 <button class=grey>
-                    Yes
+                    Our Specialized Model
                 </button>
             </a>
         </p>
     '''
 
 
-def input():
+@app.route("/input")
+def input_ours():
     return flask.render_template('index.html')
 
 
@@ -50,13 +54,13 @@ def audio():
     return proc.stderr
 
 
-@app.route("/input")
-def input_old():
-    sent = evaluation_sents[session['index']]
+@app.route("/input_cmu")
+def input_cmu():
+    sent = recog.get_current_sent()
     return '''
             <h3 align="center">Please read the following sentence: {}</h3>
             <p align="center">
-                <a href=recognizer >
+                <a href=record >
                     <button class=grey>
                         Press to record
                     </button>
@@ -65,39 +69,14 @@ def input_old():
             '''.format(sent)
 
 
+@app.route('/record')
+def record():
+    return recog.record()
+
+
 @app.route('/recognizer')
 def recognizer_old():
-    with mic as audio_file:
-        recog.adjust_for_ambient_noise(audio_file)
-        audio_data = recog.listen(audio_file)
-
-        print("Converting Speech to Text...")
-
-        result = backend.phoneme_recognizer(audio_data)
-        session['index'] += 1
-        if session['index'] < len(evaluation_sents):
-            return '''
-                <h3 align="center">You said the following: {}</h3>
-                    <p align="center">
-                        <a href=input >
-                            <button class=grey >
-                                Next
-                            </button>
-                        </a>
-                    </p>
-                '''.format(result)
-        else:
-            session['index'] = 0
-            return '''
-            <h3 align="center">You said the following: {}</h3>
-                <p align="center">
-                    <a href=input >
-                        <button class=grey >
-                            Try again?
-                        </button>
-                    </a>
-                </p>
-            '''.format(result)
+    return recog.phoneme_recognizer()
 
 
 if __name__ == "__main__":
