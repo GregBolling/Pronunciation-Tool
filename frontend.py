@@ -11,7 +11,7 @@ app.config.from_mapping(
     )
 sent = ""
 evaluation_sents = ['time', 'dog', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
-recog = backend.Recognizer(evaluation_sents)
+recog = backend.CMURecognizer(evaluation_sents)
 
 
 def generate_random_sent():
@@ -48,10 +48,7 @@ def input_ours():
 
 @app.route("/audio", methods=['POST'])
 def audio():
-    with open('./test_files/audio.wav', 'wb') as f:
-        f.write(flask.request.data)
-    proc = run(['ffprobe', '-of', 'default=noprint_wrappers=1', './test_files/audio.wav'], text=True, stderr=PIPE)
-    return proc.stderr
+    return backend.classify_correct(flask.request.data)
 
 
 @app.route("/input_cmu")

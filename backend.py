@@ -7,7 +7,7 @@ import librosa
 import speech_recognition as speech_recog
 
 
-class Recognizer(object):
+class CMURecognizer(object):
     def __init__(self, sents):
         self.sents = sents
         self.index = 0
@@ -117,4 +117,4 @@ class AudioHandler(object):
 
 
 def classify_correct(audio_data):
-    return None
+    return str(type(audio_data))
