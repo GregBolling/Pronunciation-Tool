@@ -2,8 +2,9 @@ from nltk.corpus import brown
 import random
 import flask
 from flask import Flask
-import backend
-from subprocess import run, PIPE
+from Backend import cmu_backend
+from Backend import our_backend
+import os
 
 app = Flask(__name__)
 app.config.from_mapping(
@@ -11,7 +12,7 @@ app.config.from_mapping(
     )
 sent = ""
 evaluation_sents = ['time', 'dog', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
-recog = backend.CMURecognizer(evaluation_sents)
+recog = cmu_backend.CMURecognizer(evaluation_sents)
 
 
 def generate_random_sent():
@@ -48,7 +49,11 @@ def input_ours():
 
 @app.route("/audio", methods=['POST'])
 def audio():
-    return backend.classify_correct(flask.request.data)
+    num_files = len(os.listdir(os.getcwd() + '/Backend/test_files'))
+    with open('./Backend/test_files/audio{}.wav'.format(num_files), 'wb') as f:
+        f.write(flask.request.data)
+
+    return our_backend.OurRecognizer().classify_correct(num_files)
 
 
 @app.route("/input_cmu")

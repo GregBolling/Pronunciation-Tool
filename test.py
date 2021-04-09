@@ -1,7 +1,5 @@
 import speech_recognition as speech_recog
-import backend
 import numpy as np
-import sklearn
 import matplotlib.pyplot as plt
 import librosa.display
 import wave
