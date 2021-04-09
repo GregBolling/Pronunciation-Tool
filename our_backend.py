@@ -12,7 +12,7 @@ class OurRecognizer(object):
         self.beat_features = None
 
     def classify_correct(self, num_files):
-        y, sr = librosa.load('./Backend/test_files/audio{}.wav'.format(num_files))
+        y, sr = librosa.load('./test_files/audio{}.wav'.format(num_files))
 
         # Set the hop length; at 22050 Hz, 512 samples ~= 23ms
         hop_length = 512

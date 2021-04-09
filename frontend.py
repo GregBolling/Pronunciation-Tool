@@ -11,7 +11,8 @@ app.config.from_mapping(
         SECRET_KEY='dev'
     )
 sent = ""
-evaluation_sents = ['time', 'dog', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
+evaluation_sents = [('time', 'T'), ('can', 'K'), ('teacher', 'ER'), ('fat', 'F'), ('red', 'R'), ('bat', 'B'),
+                    ('cheap', 'CH'), ('shark', 'SH'), ('shop', 'SH'), ('bake', 'B')]
 recog = cmu_backend.CMURecognizer(evaluation_sents)
 
 
@@ -33,8 +34,8 @@ def input_ours():
 
 @app.route("/audio", methods=['POST'])
 def audio():
-    num_files = len(os.listdir(os.getcwd() + '/Backend/test_files'))
-    with open('./Backend/test_files/audio{}.wav'.format(num_files), 'wb') as f:
+    num_files = len(os.listdir(os.getcwd() + '/test_files'))
+    with open('./test_files/audio{}.wav'.format(num_files), 'wb') as f:
         f.write(flask.request.data)
 
     return our_backend.OurRecognizer().classify_correct(num_files)

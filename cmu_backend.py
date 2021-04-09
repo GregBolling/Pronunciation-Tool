@@ -1,9 +1,5 @@
 from pocketsphinx import Decoder, get_model_path
 import os
-import numpy as np
-import pyaudio
-import time
-import librosa
 import speech_recognition as speech_recog
 
 
@@ -12,9 +8,13 @@ class CMURecognizer(object):
         self.sents = sents
         self.index = 0
         self.audio_data = None
+        self.outputs = ['Uh-oh, the key syllable was not found', 'Correct! Good job!']
 
     def get_current_sent(self):
-        return self.sents[self.index]
+        return self.sents[self.index][0]
+
+    def get_current_key_syllable(self):
+        return self.sents[self.index][1]
 
     def record(self):
         mic = speech_recog.Microphone(device_index=0)
@@ -34,7 +34,6 @@ class CMURecognizer(object):
             '''
 
     def phoneme_recognizer(self):
-        self.index += 1
         audio_data = self.audio_data
         model_path = get_model_path()
         raw_data = audio_data.get_raw_data(convert_rate=16000,
@@ -55,9 +54,14 @@ class CMURecognizer(object):
                             True)  # process audio data with recognition enabled (no_search = False), as a full
         # utterance (full_utt = True)
         decoder.end_utt()  # stop utterance processing
+
+        predicted = [seg.word for seg in decoder.seg()]
+        correct = int(predicted.__contains__(self.get_current_key_syllable()))
+
+        self.index += 1
         if self.index < len(self.sents):
             return '''
-                                <h3 align="center">You said the following: {}</h3>
+                                <h3 align="center">{}</h3>
                                     <p align="center">
                                         <a href=input_cmu >
                                             <button class=grey >
@@ -65,11 +69,11 @@ class CMURecognizer(object):
                                             </button>
                                         </a>
                                     </p>
-                                '''.format([seg.word for seg in decoder.seg()])
+                                '''.format(self.outputs[correct])
         else:
             self.index = 0
             return '''
-                    <h3 align="center">You said the following: {}</h3>
+                    <h3 align="center">{}</h3>
                         <p align="center">
                             <a href=input_cmu >
                                 <button class=grey >
@@ -77,6 +81,6 @@ class CMURecognizer(object):
                                 </button>
                             </a>
                         </p>
-                    '''.format([seg.word for seg in decoder.seg()])
+                    '''.format(self.outputs[correct])
 
 
