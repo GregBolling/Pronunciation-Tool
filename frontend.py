@@ -14,12 +14,7 @@ sent = ""
 evaluation_sents = [('time', 'T'), ('can', 'K'), ('teacher', 'ER'), ('fat', 'F'), ('red', 'R'), ('bat', 'B'),
                     ('cheap', 'CH'), ('shark', 'SH'), ('shop', 'SH'), ('bake', 'B')]
 recog = cmu_backend.CMURecognizer(evaluation_sents)
-
-
-def generate_random_sent():
-    corpus = brown.sents()
-    rand = random.randint(0, len(corpus))
-    return corpus[rand]
+our_recog = our_backend.OurRecognizer()
 
 
 @app.route("/") # take note of this decorator syntax, it's a common pattern
@@ -38,7 +33,7 @@ def audio():
     with open('./test_files/audio{}.wav'.format(num_files), 'wb') as f:
         f.write(flask.request.data)
 
-    return our_backend.OurRecognizer().classify_correct(num_files)
+    return our_recog.classify_correct(num_files)
 
 
 @app.route("/input_cmu")

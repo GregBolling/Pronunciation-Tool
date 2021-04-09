@@ -5,11 +5,45 @@ import librosa
 import librosa.display
 from nltk.classify import NaiveBayesClassifier
 import sklearn
+import os
+from tensorflow.keras.layers import Dense
+from tensorflow.keras import Sequential
 
 
 class OurRecognizer(object):
     def __init__(self):
-        self.model = NaiveBayesClassifier
+        # Call neural network API
+        self.model = Sequential()
+        # Apply linear activation function to input layer
+        # Generate hidden layer with 38 nodes, the same as the input layer
+        self.model.add(Dense(units=38, activation='linear', input_dim=38))
+        self.model.add(Dense(units=14, activation='linear'))
+        # Apply linear activation function to hidden layer
+        # Generate output layer with 14 nodes
+        self.model.add(Dense(units=2, activation='linear'))
+        # Compile the model
+        self.model.compile(optimizer='adam',
+                      loss='mean_squared_error',
+                      metrics=['accuracy'])
+        # self.train()
+
+    def train(self):
+        num_files = len(os.listdir(os.getcwd() + '/test_files'))
+        data = []
+        for i in range(num_files):
+            data.append(self.get_features(i))
+
+        split = int(num_files * 0.2)
+        train_data, val_data = data[split:], data[:split]
+        # Train the model
+        num_epochs = 10
+        batch_size = 256
+        self.model = self.model.fit(x=train_data, y=train_data,
+                            epochs=num_epochs,
+                            batch_size=batch_size,
+                            shuffle=True,
+                            validation_data=(val_data, val_data),
+                            verbose=1)
 
     def get_features(self, file_num):
         y, sr = librosa.load('./test_files/audio{}.wav'.format(file_num))
@@ -53,9 +87,10 @@ class OurRecognizer(object):
         for i in range(len(scaled_beat_features)):
             features['beat_feature' + str(i)] = scaled_beat_features[i]
 
-        return features
+        return scaled_beat_features
 
     def classify_correct(self, file_num):
         beat_features = self.get_features(file_num)
+        # self.model.predict(beat_features)
 
         return str(beat_features)
