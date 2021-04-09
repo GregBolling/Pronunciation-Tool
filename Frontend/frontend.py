@@ -2,8 +2,8 @@ from nltk.corpus import brown
 import random
 import flask
 from flask import Flask
-from Backend import cmu_backend
-from Backend import our_backend
+import cmu_backend
+import our_backend
 import os
 
 app = Flask(__name__)
@@ -23,23 +23,7 @@ def generate_random_sent():
 
 @app.route("/") # take note of this decorator syntax, it's a common pattern
 def homepage():
-    return '''
-        <h3 align="center">Welcome to our Pronunciation Tool! Which evaluation model would you like to use?</h3>
-        <p align="center" >
-            <a href=input_cmu >
-                <button class=grey>
-                    CMU PocketSphinx
-                </button>
-            </a>
-        </p>
-        <p align="center" >
-            <a href=input >
-                <button class=grey>
-                    Our Specialized Model
-                </button>
-            </a>
-        </p>
-    '''
+    return flask.render_template('hometitle.html')
 
 
 @app.route("/input")
