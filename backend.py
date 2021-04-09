@@ -117,4 +117,7 @@ class AudioHandler(object):
 
 
 def classify_correct(audio_data):
-    return str(type(audio_data))
+    numpy_array = np.frombuffer(audio_data, dtype=np.float32)
+    array_no_nan = numpy_array[~np.isnan(numpy_array)]
+    feature = librosa.feature.mfcc(array_no_nan, sr=44100)
+    return str(feature)
