@@ -9,6 +9,7 @@ class CMURecognizer(object):
         self.index = 0
         self.audio_data = None
         self.outputs = ['Uh-oh, the key syllable was not found', 'Correct! Good job!']
+        self.total = 0
 
     def get_current_sent(self):
         return self.sents[self.index][0]
@@ -57,6 +58,7 @@ class CMURecognizer(object):
 
         predicted = [seg.word for seg in decoder.seg()]
         correct = int(predicted.__contains__(self.get_current_key_syllable()))
+        self.total += correct
 
         self.index += 1
         if self.index < len(self.sents):
@@ -71,9 +73,11 @@ class CMURecognizer(object):
                                     </p>
                                 '''.format(self.outputs[correct])
         else:
+            average = 100 * self.total / self.index
             self.index = 0
             return '''
                     <h3 align="center">{}</h3>
+                    <h3 align="center">Score on this run was {}%</h3>
                         <p align="center">
                             <a href=input_cmu >
                                 <button class=grey >
@@ -81,6 +85,6 @@ class CMURecognizer(object):
                                 </button>
                             </a>
                         </p>
-                    '''.format(self.outputs[correct])
+                    '''.format(self.outputs[correct], average)
 
 

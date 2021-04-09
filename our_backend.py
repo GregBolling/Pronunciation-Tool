@@ -4,15 +4,15 @@ import time
 import librosa
 import librosa.display
 from nltk.classify import NaiveBayesClassifier
+import sklearn
 
 
 class OurRecognizer(object):
     def __init__(self):
         self.model = NaiveBayesClassifier
-        self.beat_features = None
 
-    def classify_correct(self, num_files):
-        y, sr = librosa.load('./test_files/audio{}.wav'.format(num_files))
+    def get_features(self, file_num):
+        y, sr = librosa.load('./test_files/audio{}.wav'.format(file_num))
 
         # Set the hop length; at 22050 Hz, 512 samples ~= 23ms
         hop_length = 512
@@ -46,7 +46,16 @@ class OurRecognizer(object):
                                         aggregate=np.median)
 
         # Finally, stack all beat-synchronous features together
-        self.beat_features = np.vstack([beat_chroma, beat_mfcc_delta])
+        beat_features = np.vstack([beat_chroma, beat_mfcc_delta])
+        scaled_beat_features = sklearn.preprocessing.scale(beat_features, axis=0)
+        features = {}
 
-        librosa.display.specshow(mfcc, sr=sr, x_axis='time')
-        return str(self.beat_features)
+        for i in range(len(scaled_beat_features)):
+            features['beat_feature' + str(i)] = scaled_beat_features[i]
+
+        return features
+
+    def classify_correct(self, file_num):
+        beat_features = self.get_features(file_num)
+
+        return str(beat_features)
