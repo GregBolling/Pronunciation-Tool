@@ -5,6 +5,7 @@ import librosa
 import librosa.display
 import sklearn
 import os
+from nltk.classify import NaiveBayesClassifier
 from tensorflow.keras.layers import Dense
 from tensorflow.keras import Sequential
 import statistics
@@ -46,26 +47,17 @@ def get_features(word, file_num):
 
     # Finally, stack all beat-synchronous features together
     beat_features = np.vstack([beat_chroma, beat_mfcc_delta])
-    scaled_beat_features = sklearn.preprocessing.scale(beat_features, axis=0)
     features = {}
 
-    for i in range(len(scaled_beat_features)):
-        features['beat_feature' + str(i)] = scaled_beat_features[i][0]
+    for i in range(len(beat_features)):
+        features['beat_feature' + str(i)] = beat_features[i][0]
 
-    return scaled_beat_features
+    return features
 
 
 class OurRecognizer(object):
     def __init__(self):
-        # Call neural network API
-        self.model = Sequential()
-        self.model.add(Dense(units=38, activation='linear', input_dim=38))
-        self.model.add(Dense(units=50, activation='linear'))
-        self.model.add(Dense(units=2, activation='softmax'))
-        # Compile the model
-        self.model.compile(optimizer='adam',
-                      loss='mean_squared_error',
-                      metrics=['accuracy'])
+        self.model = NaiveBayesClassifier
 
     def train(self, word):
         num_files = len(os.listdir(os.getcwd() + '/test_files'))
@@ -78,20 +70,13 @@ class OurRecognizer(object):
 
         split = int(num_files * 0.2)
         train_data, val_data = data[split:], data[:split]
-        train_x, train_y = [x for x, y in train_data], [y for x, y in train_data]
-        val_x, val_y = [x for x, y in val_data], [y for x, y in val_data]
         # Train the model
-        num_epochs = 10
-        batch_size = 256
-        self.model = self.model.fit(x=train_x, y=train_y,
-                            epochs=num_epochs,
-                            batch_size=batch_size,
-                            shuffle=True,
-                            validation_data=(val_x, val_y),
-                            verbose=1)
+        self.model = self.model.train(train_data)
 
     def classify_correct(self, word, file_num):
         beat_features = get_features(word, file_num)
-        # self.model.predict(beat_features)
-
-        return str(beat_features)
+        correct = self.model.classify(beat_features)
+        if correct == 1:
+            return 'Correct! Good job!'
+        else:
+            return 'Uh-oh, the key syllable was not found'
