@@ -41,16 +41,7 @@ def audio():
 @app.route("/input_cmu")
 def input_cmu():
     sent = recog.get_current_sent()
-    return '''
-            <h3 align="center">Please read the following sentence: {}</h3>
-            <p align="center">
-                <a href=record >
-                    <button class=grey>
-                        Press to record
-                    </button>
-                </a>
-            </p>
-            '''.format(sent)
+    return flask.render_template('thecmu.html', sent = sent)
 
 
 @app.route('/record')
