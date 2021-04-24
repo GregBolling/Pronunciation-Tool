@@ -34,7 +34,7 @@ class CMURecognizer(object):
                     </p>
             '''
 
-    def phoneme_recognizer(self):
+    def contains_phoneme(self):
         audio_data = self.audio_data
         model_path = get_model_path()
         raw_data = audio_data.get_raw_data(convert_rate=16000,
@@ -57,7 +57,10 @@ class CMURecognizer(object):
         decoder.end_utt()  # stop utterance processing
 
         predicted = [seg.word for seg in decoder.seg()]
-        correct = int(predicted.__contains__(self.get_current_key_syllable()))
+        return int(predicted.__contains__(self.get_current_key_syllable()))
+
+    def phoneme_recognizer(self):
+        correct = self.contains_phoneme()
         self.total += correct
 
         self.index += 1

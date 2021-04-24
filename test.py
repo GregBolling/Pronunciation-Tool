@@ -5,23 +5,40 @@ import librosa.display
 import wave
 from gtts import gTTS
 import our_backend
+import cmu_backend
+import os
 from pydub import AudioSegment
 
+evaluation_sents = [('time', 'T'), ('can', 'K'), ('teacher', 'ER'), ('fat', 'F'), ('red', 'R'), ('bat', 'B'),
+                    ('cheap', 'CH'), ('shark', 'SH'), ('shop', 'SH'), ('bake', 'B')]
+r = speech_recog.Recognizer()
 
-mic = speech_recog.Microphone(device_index=0)
-recog = speech_recog.Recognizer()
-evaluation_sents = ['time', 'bad', 'can', 'teacher', 'fat', 'red', 'bat', 'cheap', 'shark', 'shop', 'bake']
+
+def cmu_accuracy(word):
+    cmu_recog = cmu_backend.CMURecognizer(evaluation_sents)
+    num_files = len(os.listdir(os.getcwd() + '/train_files'))
+    correct = 0
+    for i in range(num_files):
+        is_correct = 1
+        if i % 4 == 3:
+            is_correct = 0
+        train_file = speech_recog.AudioFile('./train_files/{}{}.wav'.format(word, i))
+        with train_file as source:
+            audio = r.record(source)
+            cmu_recog.audio_data = audio
+            if cmu_recog.contains_phoneme() == is_correct:
+                correct += 1
+    accuracy = correct / num_files
+    return accuracy
+
+
+def our_accuracy(word):
+    our_recog = our_backend.OurRecognizer()
+    our_recog.train(word)
+    return our_recog.accuracy()
+
 
 if __name__ == '__main__':
-    word = evaluation_sents[0]
-    data = []
-    for i in range(1000):
-        if i % 4 == 3:
-            tts = gTTS('kime')
-        else:
-            tts = gTTS('time')
-        tts.save('test_files/' + word + '.mp3')
-        src = 'test_files/' + word + '.mp3'
-        dst = 'test_files/' + word + str(i) + '.wav'
-        sound = AudioSegment.from_mp3(src)
-        sound.export(dst, format="wav")
+    word = evaluation_sents[0][0]
+    print("CMU Accuracy: ", cmu_accuracy(word))
+    print("Our Model Accuracy: ", our_accuracy(word))

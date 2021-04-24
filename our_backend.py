@@ -5,14 +5,19 @@ import librosa
 import librosa.display
 import sklearn
 import os
+import nltk.classify
 from nltk.classify import NaiveBayesClassifier
+import random
 from tensorflow.keras.layers import Dense
 from tensorflow.keras import Sequential
 import statistics
 
 
-def get_features(word, file_num):
-    y, sr = librosa.load('./test_files/{}{}.wav'.format(word, file_num))
+def get_features(word, file_num, is_training=False):
+    file_type = 'test'
+    if is_training:
+        file_type = 'train'
+    y, sr = librosa.load('./{}_files/{}{}.wav'.format(file_type, word, file_num))
 
     # Set the hop length; at 22050 Hz, 512 samples ~= 23ms
     hop_length = 512
@@ -58,25 +63,30 @@ def get_features(word, file_num):
 class OurRecognizer(object):
     def __init__(self):
         self.model = NaiveBayesClassifier
+        self.val_data = []
+        self.train_data = []
 
     def train(self, word):
-        num_files = len(os.listdir(os.getcwd() + '/test_files'))
+        num_files = len(os.listdir(os.getcwd() + '/train_files'))
         data = []
         for i in range(num_files):
             if i % 4 == 3:
-                data.append((get_features(word, i), 0))
+                data.append((get_features(word, i, True), 0))
             else:
-                data.append((get_features(word, i), 1))
-
+                data.append((get_features(word, i, True), 1))
+        random.shuffle(data)
         split = int(num_files * 0.2)
-        train_data, val_data = data[split:], data[:split]
+        self.train_data, self.val_data = data[split:], data[:split]
         # Train the model
-        self.model = self.model.train(train_data)
+        self.model = self.model.train(self.train_data)
 
     def classify_correct(self, word, file_num):
         beat_features = get_features(word, file_num)
-        correct = self.model.classify(beat_features)
+        correct = 1# self.model.classify(beat_features)
         if correct == 1:
             return 'Correct! Good job!'
         else:
             return 'Uh-oh, the key syllable was not found'
+
+    def accuracy(self):
+        return nltk.classify.accuracy(self.model, self.val_data)
