@@ -7,6 +7,7 @@ from gtts import gTTS
 import our_backend
 import cmu_backend
 import os
+import nltk
 from pydub import AudioSegment
 
 evaluation_sents = [('time', 'T'), ('can', 'K'), ('teacher', 'ER'), ('fat', 'F'), ('red', 'R'), ('bat', 'B'),
@@ -20,7 +21,7 @@ def cmu_accuracy(word):
     correct = 0
     for i in range(num_files):
         is_correct = 1
-        if i % 4 == 3:
+        if i % 2 == 1:
             is_correct = 0
         train_file = speech_recog.AudioFile('./train_files/{}{}.wav'.format(word, i))
         with train_file as source:
@@ -32,8 +33,8 @@ def cmu_accuracy(word):
     return accuracy
 
 
-def our_accuracy(word):
-    our_recog = our_backend.OurRecognizer()
+def our_accuracy(word, model):
+    our_recog = our_backend.OurRecognizer(model)
     our_recog.train(word)
     return our_recog.accuracy()
 
@@ -41,4 +42,6 @@ def our_accuracy(word):
 if __name__ == '__main__':
     word = evaluation_sents[0][0]
     print("CMU Accuracy: ", cmu_accuracy(word))
-    print("Our Model Accuracy: ", our_accuracy(word))
+    print("Naive Bayes Accuracy: ", our_accuracy(word, nltk.classify.NaiveBayesClassifier))
+    print("Decision Tree Accuracy", our_accuracy(word, nltk.classify.DecisionTreeClassifier))
+    print("Max Entropy Accuracy", our_accuracy(word, nltk.classify.MaxentClassifier))

@@ -15,7 +15,7 @@ evaluation_sents = [('time', 'T'), ('can', 'K'), ('teacher', 'ER'), ('fat', 'F')
                     ('cheap', 'CH'), ('shark', 'SH'), ('shop', 'SH'), ('bake', 'B')]
 recog = cmu_backend.CMURecognizer(evaluation_sents)
 our_recog = our_backend.OurRecognizer()
-#our_recog.train(evaluation_sents[0][0])
+our_recog.train(evaluation_sents[0][0])
 is_training = False
 num_submissions = 0
 
@@ -37,7 +37,7 @@ def input_ours():
 def add_data():
     global is_training
     is_training = True
-    sent = '"' + recog.get_current_sent() + '" (3 times) and "kime" (once)'
+    sent = '"' + recog.get_current_sent() + '" (once) and then "kime" (once) repeat'
     return flask.render_template('index.html', sent=sent)
 
 

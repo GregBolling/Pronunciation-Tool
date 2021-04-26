@@ -61,8 +61,8 @@ def get_features(word, file_num, is_training=False):
 
 
 class OurRecognizer(object):
-    def __init__(self):
-        self.model = NaiveBayesClassifier
+    def __init__(self, model=NaiveBayesClassifier):
+        self.model = model
         self.val_data = []
         self.train_data = []
 
@@ -70,19 +70,19 @@ class OurRecognizer(object):
         num_files = len(os.listdir(os.getcwd() + '/train_files'))
         data = []
         for i in range(num_files):
-            if i % 4 == 3:
+            if i % 2 == 1:
                 data.append((get_features(word, i, True), 0))
             else:
                 data.append((get_features(word, i, True), 1))
-        random.shuffle(data)
         split = int(num_files * 0.2)
         self.train_data, self.val_data = data[split:], data[:split]
+        random.shuffle(self.train_data)
         # Train the model
         self.model = self.model.train(self.train_data)
 
     def classify_correct(self, word, file_num):
         beat_features = get_features(word, file_num)
-        correct = 1# self.model.classify(beat_features)
+        correct = self.model.classify(featureset=beat_features)
         if correct == 1:
             return 'Correct! Good job!'
         else:
