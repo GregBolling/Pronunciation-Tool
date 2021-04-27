@@ -17,7 +17,11 @@ The problem we hope to address with this project is the lack of tools out there 
 1. Navigate to root of Pronounciation tool in the command line
 2. Run "python test.py"
 3. There will be 4 meaningful outputs from this program:
+      
       a) "CMU Accuracy" followed by a percentage of accurate predictions in the train data directory by the CMU PocketSphinx tool
+      
       b) "Naive Bayes Accuracy" and the percentage of accurate predictions with the validation data
+      
       c) "Decision Tree Accuracy" is like the last one but with the model being trained being a Decision Tree Classifier
+      
       d) "Max Entropy Accuracy" is again like the last two but using the Maximum Entropy Classifier
