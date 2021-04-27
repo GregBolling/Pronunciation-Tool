@@ -30,18 +30,18 @@ def cmu_accuracy(word):
             if cmu_recog.contains_phoneme() == is_correct:
                 correct += 1
     accuracy = correct / num_files
-    return accuracy
+    return round(accuracy * 100, 2)
 
 
 def our_accuracy(word, model):
     our_recog = our_backend.OurRecognizer(model)
     our_recog.train(word)
-    return our_recog.accuracy()
+    return round(our_recog.accuracy() * 100, 2)
 
 
 if __name__ == '__main__':
     word = evaluation_sents[0][0]
-    print("CMU Accuracy: ", cmu_accuracy(word))
-    print("Naive Bayes Accuracy: ", our_accuracy(word, nltk.classify.NaiveBayesClassifier))
-    print("Decision Tree Accuracy", our_accuracy(word, nltk.classify.DecisionTreeClassifier))
-    print("Max Entropy Accuracy", our_accuracy(word, nltk.classify.MaxentClassifier))
+    print("CMU Accuracy: ", str(cmu_accuracy(word)) + '%')
+    print("Naive Bayes Accuracy: ", str(our_accuracy(word, nltk.classify.NaiveBayesClassifier)) + '%')
+    print("Decision Tree Accuracy: ", str(our_accuracy(word, nltk.classify.DecisionTreeClassifier)) + '%')
+    print("Max Entropy Accuracy: ", str(our_accuracy(word, nltk.classify.MaxentClassifier)) + '%')
