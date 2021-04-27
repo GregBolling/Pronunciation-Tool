@@ -6,8 +6,11 @@ The problem we hope to address with this project is the lack of tools out there 
 2. Run "python frontend.py"
 3. Fully functioning web app should appear in the browser at localhost:5000
 4. Within the web app there are 3 main pages you can navigate to:
+      
       a) "CMU POCKETSPHINX" which allows you to go through a 10 word evaluation to see which words you pronounce correctly
+      
       b) "OUR SPECIALIZED MODEL" which brings you to a speech recognition page but that currently only evaluates the pronounciation of the word "time"
+      
       c) "ADD TRAINING DATA" which looks very similar to the last page but it was added for us to be able to quickly and accurately add data to train and test our tools.
 
 ## How to run the test to compare accuracy
