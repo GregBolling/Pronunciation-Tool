@@ -25,3 +25,5 @@ The problem we hope to address with this project is the lack of tools out there 
       c) "Decision Tree Accuracy" is like the last one but with the model being trained being a Decision Tree Classifier
       
       d) "Max Entropy Accuracy" is again like the last two but using the Maximum Entropy Classifier
+      
+      (*NOTE: There is a large amount of INFO messages and warnings to be ignored in the output of this program as they do not provide any useful information for one simply running this program)
